@@ -1,0 +1,171 @@
+{% extends 'employees/base.html' %}
+
+{% block title %}Employee Directory | Nexus EMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header & Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-black tracking-tight font-heading">Employee Directory</h1>
+            <p class="text-xs text-gray-600 mt-1">Manage and view all registered staff members in your organization</p>
+        </div>
+        <a href="{% url 'employee_create' %}" class="inline-flex items-center justify-center space-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm transition-colors">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add New Employee</span>
+        </a>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+        <form method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- Search Query -->
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </div>
+                <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Search name, ID, email..."
+                    class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-xs text-black placeholder-gray-500 focus:outline-none focus:bg-white focus:border-indigo-600 transition-colors font-medium">
+            </div>
+
+            <!-- Department Filter -->
+            <div>
+                <select name="department" class="w-full py-2 px-3 bg-gray-50 border border-gray-300 rounded-lg text-xs text-black focus:outline-none focus:bg-white focus:border-indigo-600 font-medium">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}" {% if request.GET.department == dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+                <select name="status" class="w-full py-2 px-3 bg-gray-50 border border-gray-300 rounded-lg text-xs text-black focus:outline-none focus:bg-white focus:border-indigo-600 font-medium">
+                    <option value="">All Statuses</option>
+                    <option value="Active" {% if request.GET.status == 'Active' %}selected{% endif %}>Active</option>
+                    <option value="Inactive" {% if request.GET.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+
+            <!-- Submit Filter Button -->
+            <div class="flex items-center space-x-2">
+                <button type="submit" class="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-black font-semibold text-xs rounded-lg border border-gray-300 transition-colors flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-filter text-indigo-600"></i>
+                    <span>Apply Filters</span>
+                </button>
+                {% if request.GET.search or request.GET.department or request.GET.status %}
+                <a href="{% url 'employee_list' %}" class="py-2 px-3 bg-gray-200 hover:bg-gray-300 text-black text-xs rounded-lg border border-gray-300 transition-colors" title="Reset Filters">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Employee Table Container -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        {% if employees %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-black">
+                <thead class="text-xs uppercase bg-gray-100 text-black font-bold border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4">Employee</th>
+                        <th class="px-6 py-4">ID</th>
+                        <th class="px-6 py-4">Contact</th>
+                        <th class="px-6 py-4">Department & Role</th>
+                        <th class="px-6 py-4">Joining Date</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for emp in employees %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                {% if emp.image %}
+                                <img class="w-10 h-10 rounded-lg object-cover border border-gray-300" src="{{ emp.image.url }}" alt="{{ emp.name }}">
+                                {% else %}
+                                <div class="w-10 h-10 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-sm">
+                                    {{ emp.name|slice:":2"|upper }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <a href="{% url 'employee_detail' emp.pk %}" class="font-bold text-black hover:text-indigo-600 transition-colors font-heading">
+                                        {{ emp.name }}
+                                    </a>
+                                    <div class="text-xs text-gray-600 font-medium mt-0.5">
+                                        <span>{{ emp.gender }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 font-mono text-xs text-indigo-700 font-bold">
+                            {{ emp.employee_id }}
+                        </td>
+
+                        <td class="px-6 py-4 text-xs">
+                            <div class="text-black font-bold">{{ emp.email }}</div>
+                            <div class="text-gray-600 font-medium">{{ emp.phone }}</div>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-black text-xs font-heading">{{ emp.designation }}</div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-gray-100 text-black border border-gray-300 mt-0.5">
+                                {{ emp.department }}
+                            </span>
+                        </td>
+
+                        <td class="px-6 py-4 text-xs text-gray-700 font-medium">
+                            {{ emp.joining_date|date:"M d, Y" }}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            {% if emp.status == 'Active' %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5"></span>
+                                Active
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 mr-1.5"></span>
+                                Inactive
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end space-x-1">
+                                <a href="{% url 'employee_detail' emp.pk %}" class="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-gray-100 transition-colors" title="View Detail">
+                                    <i class="fa-solid fa-eye text-xs"></i>
+                                </a>
+                                <a href="{% url 'employee_update' emp.pk %}" class="p-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition-colors" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                </a>
+                                <a href="{% url 'employee_delete' emp.pk %}" class="p-2 rounded-lg text-gray-600 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Delete">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-12 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400">
+                <i class="fa-solid fa-users-slash text-2xl"></i>
+            </div>
+            <h3 class="text-base font-bold text-black font-heading">No Matching Employees</h3>
+            <p class="text-xs text-gray-600 mt-1 max-w-sm mx-auto">Try modifying your search criteria or add a new employee to the database.</p>
+            <a href="{% url 'employee_create' %}" class="inline-flex items-center space-x-2 mt-4 px-4.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg transition-colors">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Employee</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

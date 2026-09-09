@@ -1,0 +1,277 @@
+<!--
+===============================================================================
+Module: Employees - Employee Create/Edit Form Template (employee_form.html)
+===============================================================================
+Description:
+    Renders the unified form interface for adding new employee profiles or
+    editing existing employee records.
+    
+    Includes:
+    - Modular section headers (Basic Identification, Contact Info, Role, Demographics)
+    - Django Form input handling and error message feedback blocks
+    - Media file upload input for profile photograph
+    - Solid black text and clean light container styling
+===============================================================================
+-->
+
+{% extends 'employees/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Employee: {{ form.instance.name }}{% else %}Add New Employee{% endif %} | Employee Management{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Module Header & Navigation Back Button -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'employee_list' %}" class="w-9 h-9 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:text-black hover:border-gray-300 transition-colors" title="Back to Directory">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-extrabold text-black tracking-tight font-heading">
+                    {% if form.instance.pk %}Edit Employee Profile{% else %}Create Employee Record{% endif %}
+                </h1>
+                <p class="text-xs text-gray-600">Fill in the required information below to update the system</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Input Form Container -->
+    <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 sm:p-8 text-black">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Top Level Non-Field Errors -->
+            {% if form.non_field_errors %}
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+                {% for error in form.non_field_errors %}
+                <p class="flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+                    <span>{{ error }}</span>
+                </p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- SECTION 1: BASIC IDENTIFICATION -->
+            <div>
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center space-x-2 font-heading">
+                    <i class="fa-solid fa-address-card"></i>
+                    <span>Basic Identification</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Employee ID Field -->
+                    <div>
+                        <label for="{{ form.employee_id.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Employee ID <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="text" name="employee_id" id="{{ form.employee_id.id_for_label }}"
+                            value="{{ form.employee_id.value|default:'' }}" required
+                            placeholder="e.g. EMP-1001"
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.employee_id.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.employee_id.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Full Name Field -->
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Full Name <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="text" name="name" id="{{ form.name.id_for_label }}"
+                            value="{{ form.name.value|default:'' }}" required
+                            placeholder="e.g. John Doe"
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.name.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: CONTACT INFORMATION -->
+            <div class="pt-4 border-t border-gray-200">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center space-x-2 font-heading">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Contact Information</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Email Address Field -->
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Email Address <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="email" name="email" id="{{ form.email.id_for_label }}"
+                            value="{{ form.email.value|default:'' }}" required
+                            placeholder="john.doe@company.com"
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.email.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone Number Field -->
+                    <div>
+                        <label for="{{ form.phone.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Phone Number <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="text" name="phone" id="{{ form.phone.id_for_label }}"
+                            value="{{ form.phone.value|default:'' }}" required
+                            placeholder="+1 (555) 000-0000"
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.phone.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.phone.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Residential / Physical Address Field -->
+                    <div class="sm:col-span-2">
+                        <label for="{{ form.address.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Residential / Physical Address
+                        </label>
+                        <textarea name="address" id="{{ form.address.id_for_label }}" rows="3"
+                            placeholder="Enter full street address, city, state, postal code..."
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors h-20 resize-y">{{ form.address.value|default:'' }}</textarea>
+                        {% if form.address.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.address.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: ORGANIZATIONAL ROLE & SALARY -->
+            <div class="pt-4 border-t border-gray-200">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center space-x-2 font-heading">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <span>Organizational Role & Salary</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Department Field -->
+                    <div>
+                        <label for="{{ form.department.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Department <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="text" name="department" id="{{ form.department.id_for_label }}"
+                            value="{{ form.department.value|default:'' }}" required
+                            placeholder="e.g. Engineering, HR, Sales"
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.department.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.department.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Designation Field -->
+                    <div>
+                        <label for="{{ form.designation.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Designation / Job Title <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="text" name="designation" id="{{ form.designation.id_for_label }}"
+                            value="{{ form.designation.value|default:'' }}" required
+                            placeholder="e.g. Senior Software Engineer"
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.designation.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.designation.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Salary Field -->
+                    <div>
+                        <label for="{{ form.salary.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Salary (USD) <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="number" step="0.01" name="salary" id="{{ form.salary.id_for_label }}"
+                            value="{{ form.salary.value|default:'' }}" required
+                            placeholder="75000.00"
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.salary.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.salary.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Joining Date Field -->
+                    <div>
+                        <label for="{{ form.joining_date.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Joining Date <span class="text-indigo-600">*</span>
+                        </label>
+                        <input type="date" name="joining_date" id="{{ form.joining_date.id_for_label }}"
+                            value="{{ form.joining_date.value|date:'Y-m-d'|default:form.joining_date.value|default:'' }}" required
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                        {% if form.joining_date.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.joining_date.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: DEMOGRAPHICS & MEDIA UPLOAD -->
+            <div class="pt-4 border-t border-gray-200">
+                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center space-x-2 font-heading">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span>Demographics & Media</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Gender Selection -->
+                    <div>
+                        <label for="{{ form.gender.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Gender <span class="text-indigo-600">*</span>
+                        </label>
+                        <select name="gender" id="{{ form.gender.id_for_label }}" required
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                            <option value="Male" {% if form.gender.value == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if form.gender.value == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if form.gender.value == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                        {% if form.gender.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.gender.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Employment Status Selection -->
+                    <div>
+                        <label for="{{ form.status.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Employment Status <span class="text-indigo-600">*</span>
+                        </label>
+                        <select name="status" id="{{ form.status.id_for_label }}" required
+                            class="w-full py-2.5 px-3.5 bg-gray-50 border border-gray-300 rounded-xl text-black text-sm focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors">
+                            <option value="Active" {% if form.status.value == 'Active' or not form.instance.pk %}selected{% endif %}>Active</option>
+                            <option value="Inactive" {% if form.status.value == 'Inactive' %}selected{% endif %}>Inactive</option>
+                        </select>
+                        {% if form.status.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.status.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Profile Image Upload Field -->
+                    <div class="sm:col-span-2">
+                        <label for="{{ form.image.id_for_label }}" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                            Profile Picture
+                        </label>
+                        <input type="file" name="image" id="{{ form.image.id_for_label }}" accept="image/*"
+                            class="block w-full text-xs text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 file:cursor-pointer bg-gray-50 border border-gray-300 rounded-xl">
+                        {% if form.instance.image %}
+                        <div class="mt-2 flex items-center space-x-2 text-xs text-gray-600">
+                            <span>Current:</span>
+                            <a href="{{ form.instance.image.url }}" target="_blank" class="text-indigo-600 underline font-semibold">{{ form.instance.image.name }}</a>
+                        </div>
+                        {% endif %}
+                        {% if form.image.errors %}
+                        <p class="text-xs text-rose-600 mt-1 font-semibold">{{ form.image.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: FORM ACTION BUTTONS -->
+            <div class="pt-6 border-t border-gray-200 flex items-center justify-end space-x-3">
+                <a href="{% url 'employee_list' %}" class="px-5 py-2.5 rounded-xl border border-gray-300 bg-gray-100 hover:bg-gray-200 text-black font-semibold text-xs transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md transition-all hover:scale-[1.02]">
+                    <i class="fa-solid fa-check mr-1.5"></i>
+                    {% if form.instance.pk %}Update Record{% else %}Save Employee{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

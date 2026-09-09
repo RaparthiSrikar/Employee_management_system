@@ -1,0 +1,253 @@
+{% extends 'employees/base.html' %}
+{% load static %}
+
+{% block title %}Authentication | Nexus EMS{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<style>
+    .perspective-container {
+        perspective: 1400px;
+    }
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transform-style: preserve-3d;
+    }
+    .flip-card-inner.is-flipped {
+        transform: rotateY(180deg);
+    }
+    .flip-face {
+        position: relative;
+        width: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+    .flip-face-back {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: rotateY(180deg);
+    }
+</style>
+
+<div class="min-h-[85vh] flex items-center justify-center py-6 perspective-container">
+    <div class="w-full max-w-5xl">
+        
+        <!-- 3D Flip Card Container -->
+        <div id="authFlipCard" class="flip-card-inner {% if is_register %}is-flipped{% endif %}">
+            
+            <!-- FRONT FACE: SIGN IN -->
+            <div class="flip-face">
+                <div class="bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-200 grid grid-cols-1 lg:grid-cols-12 min-h-[580px]">
+                    <!-- Left Column: Background Art -->
+                    <div class="lg:col-span-6 relative flex flex-col justify-between p-8 sm:p-10 overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-200 bg-slate-900 text-white">
+                        <div class="absolute inset-0 z-0">
+                            <img src="{% static 'employees/images/signin_graphic.jpg' %}" alt="Sign In Background" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
+                        </div>
+
+                        <div class="relative z-10 flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md text-white font-bold">
+                                <i class="fa-solid fa-users-gear text-lg"></i>
+                            </div>
+                            <span class="text-xl font-extrabold font-heading text-white tracking-tight">
+                                Nexus<span class="text-indigo-400">EMS</span>
+                            </span>
+                        </div>
+
+                        <div class="relative z-10 my-12 space-y-4">
+                            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-200 text-xs font-semibold backdrop-blur-md shadow-md">
+                                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                                <span>Enterprise HR Portal</span>
+                            </div>
+                            <h2 class="text-3xl font-extrabold text-white font-heading leading-tight drop-shadow-md">
+                                Streamline Employee Operations & HR Analytics
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-200 leading-relaxed drop-shadow-sm">
+                                Access real-time employee directories, department metrics, role assignments, and centralized workforce data.
+                            </p>
+                        </div>
+
+                        <div class="relative z-10 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-300">
+                            <span class="font-medium">Protected by Biometric Security</span>
+                            <i class="fa-solid fa-shield-halved text-indigo-400 text-sm"></i>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Sign In Form -->
+                    <div class="lg:col-span-6 p-8 sm:p-10 flex flex-col justify-center relative bg-white text-slate-900">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-slate-900 font-heading tracking-tight">Welcome Back</h1>
+                            <p class="text-xs text-slate-500 mt-1">Sign in with your credentials to manage records</p>
+                        </div>
+
+                        {% if form.errors and not is_register %}
+                        <div class="mb-5 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
+                            <div class="flex items-center space-x-2 font-semibold mb-1">
+                                <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+                                <span>Authentication Failed</span>
+                            </div>
+                            <p>Invalid username or password. Please try again.</p>
+                        </div>
+                        {% endif %}
+
+                        <form method="post" action="{% url 'login' %}" class="space-y-4">
+                            {% csrf_token %}
+                            <div>
+                                <label for="id_username" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Username</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-user text-xs"></i>
+                                    </div>
+                                    <input type="text" name="username" id="id_username" required
+                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors"
+                                        placeholder="Enter your username">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="id_password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Password</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-key text-xs"></i>
+                                    </div>
+                                    <input type="password" name="password" id="id_password" required
+                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors"
+                                        placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-indigo-600/20 transition-all duration-200 hover:-translate-y-0.5 mt-2 flex items-center justify-center space-x-2">
+                                <span>Sign In to Portal</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </form>
+
+                        <div class="mt-6 text-center border-t border-slate-200 pt-5">
+                            <p class="text-xs text-slate-500 mb-3">Don't have an account yet?</p>
+                            <button type="button" onclick="flipToSignUp()"
+                                class="inline-flex items-center justify-center space-x-2 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-indigo-700 font-semibold rounded-xl text-xs border border-slate-300 shadow-sm transition-all duration-200">
+                                <i class="fa-solid fa-user-plus text-indigo-600"></i>
+                                <span>Create New Account</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BACK FACE: SIGN UP -->
+            <div class="flip-face flip-face-back">
+                <div class="bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-200 grid grid-cols-1 lg:grid-cols-12 min-h-[580px]">
+                    <!-- Left Column: Background Art -->
+                    <div class="lg:col-span-6 relative flex flex-col justify-between p-8 sm:p-10 overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-200 bg-slate-900 text-white">
+                        <div class="absolute inset-0 z-0">
+                            <img src="{% static 'employees/images/signup_graphic.jpg' %}" alt="Sign Up Background" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
+                        </div>
+
+                        <div class="relative z-10 flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md text-white font-bold">
+                                <i class="fa-solid fa-user-plus text-lg"></i>
+                            </div>
+                            <span class="text-xl font-extrabold font-heading text-white tracking-tight">
+                                Nexus<span class="text-indigo-400">EMS</span>
+                            </span>
+                        </div>
+
+                        <div class="relative z-10 my-12 space-y-4">
+                            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-violet-950/80 border border-violet-500/40 text-violet-200 text-xs font-semibold backdrop-blur-md shadow-md">
+                                <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+                                <span>Team Onboarding Portal</span>
+                            </div>
+                            <h2 class="text-3xl font-extrabold text-white font-heading leading-tight drop-shadow-md">
+                                Join Organizations & Manage Records
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-200 leading-relaxed drop-shadow-sm">
+                                Create an account to gain instant access to employee onboarding, department hierarchies, profile management, and CRUD administrative controls.
+                            </p>
+                        </div>
+
+                        <div class="relative z-10 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-300">
+                            <span class="font-medium">Role-Based Access Control</span>
+                            <i class="fa-solid fa-user-shield text-violet-400 text-sm"></i>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Sign Up Form -->
+                    <div class="lg:col-span-6 p-8 sm:p-10 flex flex-col justify-center relative bg-white text-slate-900">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-slate-900 font-heading tracking-tight">Create Account</h1>
+                            <p class="text-xs text-slate-500 mt-1">Register to start managing organization records</p>
+                        </div>
+
+                        {% if form.errors and is_register %}
+                        <div class="mb-5 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
+                            <div class="flex items-center space-x-2 font-semibold mb-1">
+                                <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+                                <span>Registration Error</span>
+                            </div>
+                            <p>Please check your details and try again.</p>
+                        </div>
+                        {% endif %}
+
+                        <form method="post" action="{% url 'register' %}" class="space-y-4">
+                            {% csrf_token %}
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Username</label>
+                                <input type="text" name="username" required
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors"
+                                    placeholder="Choose a username">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Password</label>
+                                <input type="password" name="password1" required
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors"
+                                    placeholder="Create password">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Confirm Password</label>
+                                <input type="password" name="password2" required
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition-colors"
+                                    placeholder="Confirm password">
+                            </div>
+
+                            <button type="submit"
+                                class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-indigo-600/20 transition-all duration-200 hover:-translate-y-0.5 mt-2 flex items-center justify-center space-x-2">
+                                <span>Register & Sign Up</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </form>
+
+                        <div class="mt-6 text-center border-t border-slate-200 pt-5">
+                            <p class="text-xs text-slate-500 mb-2">Already registered an account?</p>
+                            <button type="button" onclick="flipToSignIn()"
+                                class="text-indigo-600 hover:text-indigo-700 font-bold text-xs transition-colors inline-flex items-center space-x-1">
+                                <span>Sign in to your account</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function flipToSignUp() {
+        document.getElementById('authFlipCard').classList.add('is-flipped');
+        history.pushState(null, '', "{% url 'register' %}");
+    }
+    function flipToSignIn() {
+        document.getElementById('authFlipCard').classList.remove('is-flipped');
+        history.pushState(null, '', "{% url 'login' %}");
+    }
+</script>
+{% endblock %}
